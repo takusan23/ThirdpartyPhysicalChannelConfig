@@ -1,7 +1,7 @@
 # ThirdpartyPhysicalChannelConfig
 
 システム権限で保護されている`PhysicalChannelConfig`を、`Shizuku-API`を利用して取得してみる。  
-これにより、公開APIでは取得できなかった **5GのNSA 状態** とか **4Gのキャリアアグリゲーション** 状態が取れるかも、、、？
+これにより、公開APIでは取得できなかった（？） **5GのNSA 状態** とか **4Gのキャリアアグリゲーション** 状態が取れるかも、、、？
 
 # つかいかた
 
