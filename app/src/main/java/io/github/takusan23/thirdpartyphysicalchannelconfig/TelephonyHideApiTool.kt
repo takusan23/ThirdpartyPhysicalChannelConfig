@@ -1,4 +1,4 @@
-package io.github.takusan23.thirdpartyphysicalchannelconfig.ui
+package io.github.takusan23.thirdpartyphysicalchannelconfig
 
 import android.content.Context
 import android.os.ServiceManager
@@ -46,8 +46,8 @@ object TelephonyHideApiTool {
         subscriptionId: Int = defaultSubscriptionId
     ) = callbackFlow {
         val callback = object : TelephonyCallback(), TelephonyCallback.PhysicalChannelConfigListener {
-            override fun onPhysicalChannelConfigChanged(configs: MutableList<PhysicalChannelConfig>?) {
-                trySend(configs ?: emptyList())
+            override fun onPhysicalChannelConfigChanged(configs: MutableList<PhysicalChannelConfig>) {
+                trySend(configs)
             }
         }
 
@@ -89,8 +89,8 @@ object TelephonyHideApiTool {
         subscriptionId: Int = defaultSubscriptionId
     ) = callbackFlow {
         val callback = object : TelephonyCallback(), TelephonyCallback.CellInfoListener {
-            override fun onCellInfoChanged(cellInfo: MutableList<CellInfo>?) {
-                trySend(cellInfo ?: emptyList())
+            override fun onCellInfoChanged(cellInfo: MutableList<CellInfo>) {
+                trySend(cellInfo)
             }
         }
 
@@ -128,7 +128,7 @@ object TelephonyHideApiTool {
     fun collectActiveSubscriptionList(context: Context) = callbackFlow {
         val callback: IOnSubscriptionsChangedListener = object : IOnSubscriptionsChangedListener.Stub() {
             override fun onSubscriptionsChanged() {
-                val subscriptionList = subscription.getActiveSubscriptionInfoList(telephony.currentPackageName, context.attributionTag)
+                val subscriptionList = subscription.getActiveSubscriptionInfoList(telephony.currentPackageName, context.attributionTag, /*isForAllUserProfiles*/ true)
                 trySend(subscriptionList)
             }
         }

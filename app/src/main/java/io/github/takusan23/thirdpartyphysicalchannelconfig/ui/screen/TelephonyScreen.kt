@@ -16,7 +16,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import io.github.takusan23.thirdpartyphysicalchannelconfig.ui.TelephonyHideApiTool
+import io.github.takusan23.thirdpartyphysicalchannelconfig.TelephonyHideApiTool
+import java.lang.reflect.Method
 
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
@@ -61,6 +62,7 @@ fun TelephonyScreen() {
             )
         }
         items(physicalChannelConfigList.value) { config ->
+/*
             Text(text = "band = ${config.band}")
             Text(text = "cellBandwidthDownlinkKhz = ${config.cellBandwidthDownlinkKhz}")
             Text(text = "cellBandwidthUplinkKhz = ${config.cellBandwidthUplinkKhz}")
@@ -72,7 +74,14 @@ fun TelephonyScreen() {
             Text(text = "uplinkChannelNumber = ${config.uplinkChannelNumber}")
             Text(text = "uplinkFrequencyKhz = ${config.uplinkFrequencyKhz}")
             Text(text = "uplinkFrequencyKhz = ${config.uplinkFrequencyKhz}")
-            Text(text = "toString = ${config.toString()}")
+            Text(text = "toString = $config")
+*/
+            Text(
+                text = config::class.java.allMethod
+                    .map { it.name to it.safeInvoke(config) }
+                    .joinToString(separator = "\n") { "${it.first} = ${it.second}" }
+            )
+
             Divider()
         }
         item {
@@ -88,3 +97,8 @@ fun TelephonyScreen() {
     }
 
 }
+
+fun Method.safeInvoke(obj: Any) = runCatching { this.invoke(obj) }.getOrNull()
+
+val <T> Class<T>.allMethod
+    get() = (this.methods + this.declaredMethods).distinctBy { it.name }
