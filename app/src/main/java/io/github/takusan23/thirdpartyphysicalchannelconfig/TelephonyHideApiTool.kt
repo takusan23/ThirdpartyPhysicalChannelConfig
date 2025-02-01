@@ -1,9 +1,11 @@
 package io.github.takusan23.thirdpartyphysicalchannelconfig
 
 import android.content.Context
+import android.os.Build
 import android.os.ServiceManager
 import android.telephony.CellInfo
 import android.telephony.PhysicalChannelConfig
+import android.telephony.SubscriptionInfo
 import android.telephony.SubscriptionManager
 import android.telephony.TelephonyCallback
 import com.android.internal.telephony.IOnSubscriptionsChangedListener
@@ -128,7 +130,7 @@ object TelephonyHideApiTool {
     fun collectActiveSubscriptionList(context: Context) = callbackFlow {
         val callback: IOnSubscriptionsChangedListener = object : IOnSubscriptionsChangedListener.Stub() {
             override fun onSubscriptionsChanged() {
-                val subscriptionList = subscription.getActiveSubscriptionInfoList(telephony.currentPackageName, context.attributionTag, /*isForAllUserProfiles*/ true)
+                val subscriptionList = subscription.compatGetActiveSubscriptionInfoList(telephony.currentPackageName, context.attributionTag, /*isForAllUserProfiles*/ true)
                 trySend(subscriptionList)
             }
         }
@@ -144,6 +146,16 @@ object TelephonyHideApiTool {
                 callback
             )
         }
+    }
+
+    private fun ISub.compatGetActiveSubscriptionInfoList(callingPackage: String, callingFeatureId: String?, isForAllProfiles: Boolean): List<SubscriptionInfo> {
+        // バージョンによって引数が変わってるのでリフレクション
+        val invokeMethod = ISub::class.java.methods.first { it.name == "getActiveSubscriptionInfoList" }
+        val result = when {
+            Build.VERSION.SDK_INT <= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> invokeMethod.invoke(this, callingPackage, callingFeatureId)
+            else -> invokeMethod.invoke(this, callingPackage, callingFeatureId, isForAllProfiles)
+        }
+        return result as List<SubscriptionInfo>
     }
 
 }
